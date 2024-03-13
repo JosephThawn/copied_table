@@ -1,7 +1,7 @@
 import * as React from "react";
 import { DataGridPremium, GridColDef } from "@mui/x-data-grid-premium";
 import { useDemoData } from "@mui/x-data-grid-generator";
-import Alert from "@mui/material/Alert";
+import { Alert, Button } from "@mui/material";
 import AlertTitle from "@mui/material/AlertTitle";
 
 export default function ClipboardCopy() {
@@ -16,6 +16,8 @@ export default function ClipboardCopy() {
     const persistedData = localStorage.getItem("copiedData");
     return persistedData ? persistedData : "";
   });
+  const [selectedRows, setSelectedRows] = React.useState([]);
+  const [addedRows, setAddedRows] = React.useState([]);
 
   React.useEffect(() => {
     // Persist copiedData to localStorage whenever it changes
@@ -65,9 +67,35 @@ export default function ClipboardCopy() {
           checkboxSelection
           disableRowSelectionOnClick
           // unstable_cellSelection
+          onSelectionModelChange={(newSelection) => {
+            const selectedIDs = new Set(newSelection);
+            const selectedRowData = data.rows.filter((row) =>
+              selectedIDs.has(row.id)
+            );
+            setSelectedRows(selectedRowData);
+          }}
           onClipboardCopy={(copiedString) => setCopiedData(copiedString)}
+          // clipboardCopyCellDelimiter={","}
+          // unstable_splitClipboardPastedText={(text) =>
+          //   text.split("\n").map((row) => row.split(","))
+          // }
           unstable_ignoreValueFormatterDuringExport
         />
+        {/* <div style={{ height: 200, width: "100%" }}>
+          <Button
+            onClick={() => {
+              // Add the selected rows to the addedRows state
+              setAddedRows((prevAddedRows) => [
+                ...prevAddedRows,
+                ...selectedRows,
+              ]);
+              // Optionally, clear the current selection
+              setSelectedRows([]);
+            }}
+          >
+            Add Selected
+          </Button>
+        </div> */}
       </div>
       {copiedData && (
         <Alert severity="info" sx={{ width: "100%", mt: 2 }}>
