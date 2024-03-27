@@ -1,125 +1,89 @@
-import * as React from "react";
-import { DataGridPremium, GridColDef } from "@mui/x-data-grid-premium";
-import { useDemoData } from "@mui/x-data-grid-generator";
-import { Alert, Button } from "@mui/material";
-import AlertTitle from "@mui/material/AlertTitle";
+import { Button } from "@mui/base";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  TextField,
+  DialogActions,
+} from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
+import React, { useState } from "react";
 
-export default function ClipboardCopy() {
-  const { data } = useDemoData({
-    dataSet: "Commodity",
-    rowLength: 10,
-    maxColumns: 20,
-  });
+const App = () => {
+  const initialRows = [
+    { id: 1, name: "Joseph", address: "1234 St Tulsa Ok" },
+    { id: 2, name: "Peter", address: "435 St Dumas TX" },
+    { id: 3, name: "John", address: "356 St Dallas CI" },
+  ];
+  const [rows, setRows] = useState(initialRows);
+  const [openModal, setOpenModal] = useState(false);
+  const [editableRow, setEditableRow] = useState({});
 
-  const [copiedData, setCopiedData] = React.useState(() => {
-    // Retrieve persisted data from localStorage when the component mounts
-    const persistedData = localStorage.getItem("copiedData");
-    return persistedData ? persistedData : "";
-  });
-  const [selectedRows, setSelectedRows] = React.useState([]);
-  const [addedRows, setAddedRows] = React.useState([]);
-
-  React.useEffect(() => {
-    // Persist copiedData to localStorage whenever it changes
-    localStorage.setItem("copiedData", copiedData);
-  }, [copiedData]);
-
-  const initialState = {
-    ...data.initialState,
-    columns: {
-      columnVisibilityModel: {
-        id: false,
-        desk: false,
-      },
-    },
+  const handleCopy = (row) => {
+    setEditableRow({ ...row });
+    setOpenModal(true);
   };
 
-  // Function to parse the copied string into rows and columns for DataGridPremium
-  const { rows, columns } = React.useMemo(() => {
-    const rowsArray = parseCopiedData(copiedData);
-    if (rowsArray.length === 0) return { rows: [], columns: [] };
+  const handleClose = () => {
+    setOpenModal(false);
+  };
 
-    const columns = rowsArray[0].map((cell, index) => ({
-      field: `col${index}`,
-      headerName: cell,
-      width: 150,
-    }));
+  const handleChange = (e) => {
+    setEditableRow({ ...editableRow, [e.target.name]: e.target.value });
+  };
 
-    const rows = rowsArray.slice(1).map((row, rowIndex) => {
-      return row.reduce(
-        (acc, cell, cellIndex) => {
-          acc[`col${cellIndex}`] = cell;
-          return acc;
-        },
-        { id: rowIndex }
-      );
-    });
+  const handleSubmit = () => [
+    setRows([...rows, { ...editableRow, id: rows.length + 1 }]),
+    setOpenModal(false),
+  ];
 
-    return { rows, columns };
-  }, [copiedData]);
+  const columns = [
+    { field: "id", headerName: "ID", width: 200 },
+    { field: "name", headerName: "Nmae", width: 200 },
+    { field: "address", headerName: "Address", width: 200 },
+    {
+      field: "actions",
+      headerName: "Copy",
+      renderCell: (params) => {
+        console.log("params", params);
+        return <Button onClick={() => handleCopy(params.row)}>copy row</Button>;
+      },
+    },
+  ];
 
   return (
-    <div style={{ width: "100%", marginTop: 20 }}>
-      <div style={{ height: 400, width: "100%" }}>
-        <DataGridPremium
-          {...data}
-          initialState={initialState}
-          checkboxSelection
-          disableRowSelectionOnClick
-          // unstable_cellSelection
-          onSelectionModelChange={(newSelection) => {
-            const selectedIDs = new Set(newSelection);
-            const selectedRowData = data.rows.filter((row) =>
-              selectedIDs.has(row.id)
-            );
-            setSelectedRows(selectedRowData);
-          }}
-          onClipboardCopy={(copiedString) => setCopiedData(copiedString)}
-          // clipboardCopyCellDelimiter={","}
-          // unstable_splitClipboardPastedText={(text) =>
-          //   text.split("\n").map((row) => row.split(","))
-          // }
-          unstable_ignoreValueFormatterDuringExport
-        />
-        {/* <div style={{ height: 200, width: "100%" }}>
-          <Button
-            onClick={() => {
-              // Add the selected rows to the addedRows state
-              setAddedRows((prevAddedRows) => [
-                ...prevAddedRows,
-                ...selectedRows,
-              ]);
-              // Optionally, clear the current selection
-              setSelectedRows([]);
-            }}
-          >
-            Add Selected
-          </Button>
-        </div> */}
-      </div>
-      {copiedData && (
-        <Alert severity="info" sx={{ width: "100%", mt: 2 }}>
-          <AlertTitle>Copied data:</AlertTitle>
-          <div style={{ height: 400, width: "100%" }}>
-            <DataGridPremium
-              rows={rows}
-              columns={columns}
-              pageSize={5}
-              rowsPerPageOptions={[5]}
-              checkboxSelection
-              disableSelectionOnClick
-            />
-          </div>
-        </Alert>
-      )}
+    <div>
+      <DataGrid rows={rows} columns={columns} page={5}></DataGrid>
+      <Dialog open={openModal} onClose={handleClose}>
+        <DialogTitle>A copy row</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            name="name"
+            type="text"
+            variant="standard"
+            fullWidth
+            value={editableRow.name || ""}
+            onChange={handleChange}
+          />
+          <TextField
+            margin="dense"
+            name="address"
+            type="text"
+            variant="standard"
+            fullWidth
+            value={editableRow.address || ""}
+            onChange={handleChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>cancle</Button>
+          <Button onClick={handleSubmit}>Submit</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
-}
-
-// Function to parse the copied string into a 2D array
-const parseCopiedData = (dataString) => {
-  return dataString
-    .split("\n")
-    .filter((row) => row)
-    .map((row) => row.split("\t"));
 };
+
+export default App;
