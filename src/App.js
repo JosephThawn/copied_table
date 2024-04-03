@@ -1,13 +1,7 @@
-import { Button } from "@mui/base";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  DialogActions,
-} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import React, { useState } from "react";
+import ManualDrawer from "./ManualDrawer";
+import DataGridColumns from "./DataGridColumns";
 
 const App = () => {
   const initialRows = [
@@ -18,10 +12,18 @@ const App = () => {
   const [rows, setRows] = useState(initialRows);
   const [openModal, setOpenModal] = useState(false);
   const [editableRow, setEditableRow] = useState({});
+  const [modalMode, setModalMode] = useState("");
 
   const handleCopy = (row) => {
     setEditableRow({ ...row });
     setOpenModal(true);
+    setModalMode("copy");
+  };
+
+  const handleEdit = (row) => {
+    setEditableRow({ ...row });
+    setOpenModal(true);
+    setModalMode("edit");
   };
 
   const handleClose = () => {
@@ -37,51 +39,28 @@ const App = () => {
     setOpenModal(false),
   ];
 
-  const columns = [
-    { field: "id", headerName: "ID", width: 200 },
-    { field: "name", headerName: "Nmae", width: 200 },
-    { field: "address", headerName: "Address", width: 200 },
-    {
-      field: "actions",
-      headerName: "Copy",
-      renderCell: (params) => {
-        console.log("params", params);
-        return <Button onClick={() => handleCopy(params.row)}>copy row</Button>;
-      },
-    },
-  ];
+  const handleSave = () => {
+    const updateRow = rows.map((row) =>
+      row.id === editableRow.id ? editableRow : row
+    );
+    setRows(updateRow);
+    setOpenModal(false);
+  };
+
+  const columns = DataGridColumns({ handleCopy, handleEdit });
 
   return (
     <div>
       <DataGrid rows={rows} columns={columns} page={5}></DataGrid>
-      <Dialog open={openModal} onClose={handleClose}>
-        <DialogTitle>A copy row</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            name="name"
-            type="text"
-            variant="standard"
-            fullWidth
-            value={editableRow.name || ""}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="dense"
-            name="address"
-            type="text"
-            variant="standard"
-            fullWidth
-            value={editableRow.address || ""}
-            onChange={handleChange}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>cancle</Button>
-          <Button onClick={handleSubmit}>Submit</Button>
-        </DialogActions>
-      </Dialog>
+      <ManualDrawer
+        openModal={openModal}
+        handleClose={handleClose}
+        handleChange={handleChange}
+        editableRow={editableRow}
+        handleSubmit={handleSubmit}
+        modalMode={modalMode}
+        handleSave={handleSave}
+      />
     </div>
   );
 };
