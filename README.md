@@ -1,70 +1,19 @@
-# Getting Started with Create React App
+The provided code illustrates a React application utilizing Material-UI's DataGrid component to display a list of rows, along with functionalities for editing, copying, and handling modal dialogs for user inputs. This implementation makes use of React hooks for state management and components from both Material-UI core and Material-UI base packages to build a user interface that allows interaction with the data presented in the DataGrid. Here's a breakdown of the code's implementation:
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### `App` Component
+- **State Initialization**: Initializes the state with default rows for the DataGrid, and variables to control modal visibility (`openModal`), the row currently being edited or copied (`editableRow`), and the mode of the modal (`modalMode`).
+- **Event Handlers**: Implements functions to handle actions such as `handleCopy`, `handleEdit`, `handleClose`, `handleChange`, `handleSubmit`, and `handleSave`. These functions perform actions like setting the current row for editing or copying, opening or closing the modal, updating the editable row's information, adding a new row, or saving edits to an existing row.
+- **Columns Configuration**: Uses a custom `DataGridColumns` component to configure columns for the DataGrid, including custom renderers for "Copy" and "Edit" action buttons.
+- **Rendering**: Renders the `DataGrid` with the configured columns and rows, and the `ManualDrawer` component which acts as a modal dialog for editing or copying rows.
 
-## Available Scripts
+### `DataGridColumns` Component
+- **Props**: Receives `handleCopy` and `handleEdit` functions as props.
+- **Column Configuration**: Returns an array of objects defining the columns for the DataGrid. This includes columns for "ID", "Name", "Address", and two action columns for "Copy" and "Edit", each with a button that triggers the respective handler function passed as props.
 
-In the project directory, you can run:
+### `ManualDrawer` Component
+- **Props**: Receives several props to control its behavior, including `openModal`, `handleClose`, `handleChange`, `editableRow`, `handleSubmit`, `modalMode`, and `handleSave`.
+- **Dialog Setup**: Utilizes Material-UI's `Dialog` component to create a modal that is controlled by the `openModal` prop. The dialog title changes based on the `modalMode` to indicate whether the user is creating a copy of a row or editing an existing row.
+- **Form Fields**: Contains `TextField` components for "Name" and "Address", which display and update values based on the `editableRow` state.
+- **Actions**: Provides buttons for "Cancel", "Save", or "Submit", depending on the `modalMode`. These buttons are linked to `handleClose`, `handleSave`, or `handleSubmit` functions to perform their respective actions.
 
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This code demonstrates a practical use of React functional components, hooks for state management, and Material-UI components to create a dynamic and interactive data management UI. The separation of concerns among different components enhances reusability and maintainability of the code.
